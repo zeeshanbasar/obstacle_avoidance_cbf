@@ -1,0 +1,7 @@
+[project]
+name = "cbf-avoidance"
+version = "0.1.0"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
