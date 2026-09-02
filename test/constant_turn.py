@@ -22,6 +22,7 @@ h = 0.02
 
 traj = rk45.simulate(f=vehicle.f, 
                      x0=x0, 
+                     xg=np.array([0.0,0.0,0.0,0.0]),
                      u0=u0,
                      h=h,
                      T=tf)
