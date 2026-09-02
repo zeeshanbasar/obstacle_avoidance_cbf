@@ -8,5 +8,5 @@ build/
 dist/
 test/test_vehicle.py
 test/test_integrate.py
-test/vehicle_guidance.py
+test/test_guidance.py
 test/conftest.py
