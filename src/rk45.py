@@ -15,8 +15,8 @@ def simulate(f, x0, xg, u0, h, T=None, nSteps=None):
     t = 0.0
     x = x0
     traj = [x0.copy()]
-    u = u0 #change this to the controller
-    # u = u0(x0, xg)
+    # u = u0 #change this to the controller
+    u = u0(x0, xg)
 
     if (T is None) == (nSteps is None):
         raise ValueError("Give exactly one of T or nSteps.")
@@ -25,11 +25,11 @@ def simulate(f, x0, xg, u0, h, T=None, nSteps=None):
         
     for _ in range(nSteps):
         x = rk4(f, t, x, u, h)
-        # u = u0(x, xg)
+        u = u0(x, xg)
         t += h
         traj.append(x.copy())
 
-        if np.linalg.norm(x[:2]-xg[:2]) < 0.01:
+        if np.linalg.norm(x[:2]-xg[:2]) < 5.0:
             break
 
     return np.array(traj)

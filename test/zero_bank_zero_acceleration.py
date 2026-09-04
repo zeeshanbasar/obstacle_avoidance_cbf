@@ -23,9 +23,9 @@ traj = rk45.simulate(f=vehicle.f,
                      h=h,
                      T=tf)
 
-px = traj[:, 0]
-py = traj[:, 1]
+# px = traj[:, 0]
+# py = traj[:, 1]
 
-plt.plot(px, py)
-plt.grid()
-plt.show()
+# plt.plot(px, py)
+# plt.grid()
+# plt.show()
