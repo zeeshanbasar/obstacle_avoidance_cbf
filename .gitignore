@@ -1,4 +1,4 @@
-venv/
+.venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -13,3 +13,4 @@ test/conftest.py
 test/test_filter.py
 test/test_obstacle.py
 figs/
+.vscode/

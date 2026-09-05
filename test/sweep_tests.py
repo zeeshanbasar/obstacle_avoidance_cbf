@@ -21,13 +21,13 @@ V_g = V_0
 xg = np.array([-400.0, 0.0, psi_g, V_g])
 
 t0, tf = 0.0, 200.0
-h = 0.02
+# h = 0.02
 
 po_x, r_o = 0.0, 50.0
 for po_y in [0.0, 10.0, 25.0, 50.0]:
     obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
 
-    sol = filter.Solver(x_dim=4, u_dim=2, obs=obs, dt=h)
+    sol = filter.Solver(x_dim=4, u_dim=2, obs=obs, dt=0.02)
     sol.reset()
 
     t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
@@ -35,7 +35,7 @@ for po_y in [0.0, 10.0, 25.0, 50.0]:
                                                                     x0=x0, 
                                                                     xg=xg,
                                                                     u0=guidance.nominal,
-                                                                    h=h,
+                                                                    h=0.02,
                                                                     T=tf)
 
     px = traj[:, 0]
