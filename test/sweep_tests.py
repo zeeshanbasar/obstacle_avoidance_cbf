@@ -61,6 +61,7 @@ for po_y in [0.0, 10.0, 25.0, 50.0]:
     print(f"path length = {helpers.path_length(px, py):.2f} m")
     print(f"max |a| = {np.max(np.abs(a)):.2f} m/s^2")
     print(f"max |phi| = {np.max(np.abs(phi)):.2f} rads")
+    print(f"max slack = {np.max(slacks):.6f}")
 
 
 
