@@ -12,3 +12,4 @@ test/test_guidance.py
 test/conftest.py
 test/test_filter.py
 test/test_obstacle.py
+figs/

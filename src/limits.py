@@ -3,7 +3,7 @@ import numpy as np
 V_STALL = 12.0
 V_CRUISE = 18.0
 V_MAX = 30.0
-PHI_MAX = np.deg2rad(45.0)
+PHI_MAX = 0.785
 A_MAX = 2.0
 PHI_DOT_MAX = 1.05
 

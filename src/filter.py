@@ -111,8 +111,8 @@ class Solver():
         # Roll rate constraint - set value
         phi_prev = np.arctan(self.t_phi_prev)
         self.d = limits.PHI_DOT_MAX * self.dt
-        opti.set_value(t_lo, max(phi_prev - self.d, -limits.PHI_MAX))
-        opti.set_value(t_hi, min(phi_prev + self.d, limits.PHI_MAX))
+        opti.set_value(t_lo, ca.tan(max(phi_prev - self.d, -limits.PHI_MAX)))
+        opti.set_value(t_hi, ca.tan(min(phi_prev + self.d, limits.PHI_MAX)))
 
         try:
             # Solve optimization problem
