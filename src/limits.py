@@ -12,3 +12,8 @@ K_V = 0.5
 
 K_0 = 1.0
 K_1 = 1.0
+
+X_MAX = Y_MAX = 1000.0
+XO_MAX = YO_MAX = 850.0
+RO_MAX = 100.0
+RO_MIN = 10.0

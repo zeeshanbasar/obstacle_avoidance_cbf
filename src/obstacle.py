@@ -5,11 +5,13 @@ g = 9.81
 
 class Obstacle():
 
-    def __init__(self, po_x=0.0, po_y=0.0, po_r=50.0):
+    def __init__(self, po_x=0.0, po_y=0.0, po_r=50.0, delta=0.0):
 
         self.po_x = po_x
         self.po_y = po_y
-        self.po_r = po_r
+        self.delta = delta
+        self.po_r = po_r + self.delta
+        self.po_r_true = po_r
 
     def h(self, x):
 
