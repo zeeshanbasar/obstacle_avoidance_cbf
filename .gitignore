@@ -13,6 +13,7 @@ test/test_estimator.py
 test/conftest.py
 test/test_filter.py
 test/test_obstacle.py
+test/test_filter_multi.py
 figs/
 .vscode/.venv/
 .vscode/

@@ -7,7 +7,7 @@ from src.obstacle import Obstacle
 
 class Solver():
 
-    def __init__(self, x_dim, u_dim, obs, dt):
+    def __init__(self, x_dim, u_dim, obs=None, dt=0.02, n_obs=1, max_n_obs=1):
 
         self.x_dim = x_dim
         self.u_dim = u_dim
@@ -24,6 +24,10 @@ class Solver():
         self.t_phi_prev = 0.0
         self.d = limits.PHI_DOT_MAX * self.dt
 
+        self.n_obs = n_obs
+
+        self.max_n_obs = max_n_obs
+
         self.setup_solver()
 
     def setup_solver(self):
@@ -37,10 +41,10 @@ class Solver():
         current_x_var = opti.parameter(nx, 1)
         uncert_u_nom = opti.parameter(nu, 1)
 
-        slack_var = opti.variable(1, 1)
+        slack_var = opti.variable(self.max_n_obs, 1)
 
-        A = opti.parameter(1,2)
-        b = opti.parameter()
+        A = opti.parameter(self.max_n_obs,2)
+        b = opti.parameter(self.max_n_obs,1)
 
         t_hi = opti.parameter()
         t_lo = opti.parameter()
@@ -52,7 +56,7 @@ class Solver():
         opti.subject_to(slack_var >= 0.0)
 
         cost = 0.5 * ca.dot((uncert_u_nom - u_var), self.W * (uncert_u_nom - u_var)) \
-            +  self.slack_weight * slack_var**2
+            +  self.slack_weight * ca.dot(slack_var, slack_var)
 
         # Input constraint
         opti.subject_to(u_var[0] <= limits.A_MAX)
@@ -102,9 +106,17 @@ class Solver():
         opti.set_value(uncertified_action_var, u_nom)
 
         # CBF constraint - set value
-        _A, _b = self.obs.constraint(x=x,
+        _A, _b = np.array([]), np.array([])
+        for obs in self.obs:
+            A_temp, b_temp = obs.constraint(x=x,
                                     u=u_nom)
+            
+            _A = np.vstack((_A, A_temp)) if _A.size else A_temp
+            _b = np.vstack((_b, b_temp)) if _b.size else b_temp
 
+        _A = np.vstack((_A, self.A_pad)) if _A.size else self.A_pad
+        _b = np.vstack((_b, self.b_pad)) if _b.size else self.b_pad
+        
         opti.set_value(A, _A)
         opti.set_value(b, _b)
 
@@ -123,9 +135,10 @@ class Solver():
             self.t_phi_prev = certified_action[1]
 
             slack_val = sol.value(slack_var)
-            if slack_val > self.slack_tolerance:
+            s_real = slack_val[:self.n_obs] if self.n_obs > 1 else slack_val
+            if np.max(s_real, initial=0.0) > self.slack_tolerance:
                 print('\nFailed: Slack greater than tolerance')
-                print('Slack:', slack_val)
+                print('Slack:', slack_val[:self.n_obs])
                 print('------------------------------------------------')
                 feasible = False
             c = sol.value(cost)
@@ -144,3 +157,11 @@ class Solver():
     def reset(self, tphi0=0.0):
 
         self.t_phi_prev = tphi0
+
+    def set_obstacles(self, obstacles):
+
+
+        self.obs = obstacles
+        self.n_obs = len(obstacles)
+        self.A_pad = np.zeros((self.max_n_obs - self.n_obs, self.u_dim))
+        self.b_pad = np.zeros((self.max_n_obs - self.n_obs, 1))
