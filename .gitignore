@@ -9,6 +9,7 @@ dist/
 test/test_vehicle.py
 test/test_integrate.py
 test/test_guidance.py
+test/test_estimator.py
 test/conftest.py
 test/test_filter.py
 test/test_obstacle.py
