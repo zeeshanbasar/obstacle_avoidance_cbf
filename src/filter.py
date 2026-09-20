@@ -7,7 +7,7 @@ from src.obstacle import Obstacle
 
 class Solver():
 
-    def __init__(self, x_dim, u_dim, obs=None, dt=0.02, n_obs=1, max_n_obs=1):
+    def __init__(self, x_dim, u_dim, obs=[], dt=0.02, n_obs=1, max_n_obs=1):
 
         self.x_dim = x_dim
         self.u_dim = u_dim

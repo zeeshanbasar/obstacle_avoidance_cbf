@@ -23,20 +23,20 @@ V_g = V_0
 xg = np.array([-400.0, 0.0, psi_g, V_g])
 
 t0, tf = 0.0, 200.0
-h = 0.02
+DT = 0.02
 
 po_x, po_y, r_o = 0.0, 0.0, 50.0
-obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
+obs = [obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)]
 
-sol = filter.Solver(x_dim=4, u_dim=2, dt=h, max_n_obs=1)
-sol.set_obstacles(obstacles=[obs])
+sol = filter.Solver(x_dim=4, u_dim=2, dt=DT, max_n_obs=1)
+sol.set_obstacles(obstacles=obs)
 
 t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                 sol=sol,
                                                                 x0=x0, 
                                                                 xg=xg,
                                                                 u0=guidance.nominal,
-                                                                h=h,
+                                                                h=DT,
                                                                 T=tf,
                                                                 sens=sens)
 
@@ -53,7 +53,7 @@ phi = np.arctan(inputs[:,1])
 
 h = []
 for i in range(len(traj)):
-    h.append(obs.h(traj[i,:]))
+    h.append(obs[0].h(traj[i,:]))
 
 print(f"min h = {min(h):.6f}")
 print(f"min h at t = {t[np.argmin(h)]:.2f} s")
@@ -66,7 +66,7 @@ print(f"max |phi| = {np.max(np.abs(phi)):.2f} rads")
 
 fig0, ax0 = plt.subplots(1, 1)
 ax0.plot(px, py, label='traj')
-ax0.add_patch(plt.Circle((obs.po_x, obs.po_y), obs.po_r,
+ax0.add_patch(plt.Circle((obs[0].po_x, obs[0].po_y), obs[0].po_r,
                          facecolor='0.85', edgecolor='k', zorder=0))
 ax0.plot(px[0], py[0], 'o', label='start')
 ax0.plot(xg[0], xg[1], '*', markersize=12, label='goal')

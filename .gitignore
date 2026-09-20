@@ -14,7 +14,7 @@ dist/
 # test/test_filter.py
 # test/test_obstacle.py
 # test/test_filter_multi.py
-test/
+# test/
 figs/
 .vscode/.venv/
 .vscode/
@@ -22,6 +22,6 @@ __pycache__/
 *.egg-info/
 *.pyc
 # figures/
-scripts/
+scripts/dropout_diagnostic.py
 outputs/
 plotting.py
