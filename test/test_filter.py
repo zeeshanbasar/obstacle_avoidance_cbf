@@ -60,7 +60,7 @@ def test_barrier_row_is_slack_far_away(sol):
     for x, u_nom in zip(X, U):
         if np.hypot(x[0], x[1]) < 600.0:
             continue
-        A, b = sol.obs.constraint(x, u_nom)
+        A, b = sol.obs[0].constraint(x, u_nom)
         assert A @ u_nom - b > 0.0
 
 
@@ -118,7 +118,7 @@ def test_row_holds_whenever_slack_is_zero(sol):
         sol.reset()
         u, s = sol.solve(x, u_nom)
         if s < 1e-6:
-            A, b = sol.obs.constraint(x, u)
+            A, b = sol.obs[0].constraint(x, u)
             assert A @ u >= b - 1e-6
 
 

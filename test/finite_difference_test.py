@@ -21,7 +21,7 @@ for i in range(200):
 
     R = o.h_dot(x)
 
-    if np.abs(L-R) > 1e-3:
+    if np.abs(L-R) > 1e-4:
         print(f"finite difference failed at sample {i}:")
         print(f"x = {x}")
         print(f"u = {u}")

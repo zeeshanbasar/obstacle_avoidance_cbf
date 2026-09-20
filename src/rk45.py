@@ -74,7 +74,7 @@ def simulate_with_filter(f, sol, x0, xg, u0, h, T=None, nSteps=None, sens=None):
         x_hat_store.append(x_hat.copy())
         age.append(sens.age)
 
-        if np.linalg.norm(x[:2]-xg[:2]) < 5.0:
+        if np.linalg.norm(x[:2]-xg[:2]) < 10.0:
             break
 
     return np.array(time), np.array(traj), np.array(uncert_inputs), np.array(inputs), np.array(slacks), np.array(x_hat_store), np.array(age)

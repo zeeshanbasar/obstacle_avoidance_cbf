@@ -24,9 +24,12 @@ class Solver():
         self.t_phi_prev = 0.0
         self.d = limits.PHI_DOT_MAX * self.dt
 
-        self.n_obs = n_obs
+        self.n_obs = len(obs)
 
         self.max_n_obs = max_n_obs
+
+        self.A_pad = np.zeros((self.max_n_obs - self.n_obs, self.u_dim))
+        self.b_pad = np.zeros((self.max_n_obs - self.n_obs, 1))
 
         self.setup_solver()
 

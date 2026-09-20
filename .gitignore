@@ -14,13 +14,14 @@ dist/
 # test/test_filter.py
 # test/test_obstacle.py
 # test/test_filter_multi.py
+test/
 figs/
 .vscode/.venv/
 .vscode/
 __pycache__/
 *.egg-info/
 *.pyc
-figures/
+# figures/
 scripts/
 outputs/
 plotting.py
