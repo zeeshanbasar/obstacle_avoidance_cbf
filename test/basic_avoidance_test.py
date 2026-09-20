@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle
+from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, estimator
 
 g = 9.81
+
+sens = estimator.Sensor()
 
 ##### INIT #####
 V_0 = limits.V_CRUISE
@@ -26,15 +28,17 @@ h = 0.02
 po_x, po_y, r_o = 0.0, 0.0, 50.0
 obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
 
-sol = filter.Solver(x_dim=4, u_dim=2, obs=obs, dt=h)
+sol = filter.Solver(x_dim=4, u_dim=2, dt=h, max_n_obs=1)
+sol.set_obstacles(obstacles=[obs])
 
-t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                 sol=sol,
                                                                 x0=x0, 
                                                                 xg=xg,
                                                                 u0=guidance.nominal,
                                                                 h=h,
-                                                                T=tf)
+                                                                T=tf,
+                                                                sens=sens)
 
 px = traj[:, 0]
 py = traj[:, 1]

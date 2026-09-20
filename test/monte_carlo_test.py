@@ -1,10 +1,11 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, scenario_gen
+from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, scenario_gen, estimator
 
 g = 9.81
-scene = scenario_gen.Scenario()
+scene = scenario_gen.Scenario(SCENE_SEED=42)
+sens = estimator.Sensor()
 t0, tf = 0.0, 200.0
 dt = 0.02
 
@@ -43,7 +44,7 @@ for i in range(500):
 
     obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
 
-    sol.obs = obs
+    sol.set_obstacles(obstacles=[obs])
     sol.reset(tphi0=t_phi_0)
 
     # Record skeleton. Every branch writes the same keys.
@@ -79,13 +80,14 @@ for i in range(500):
         continue
 
 
-    t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+    t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                     sol=sol,
                                                                     x0=x0, 
                                                                     xg=xg,
                                                                     u0=guidance.nominal,
                                                                     h=dt,
-                                                                    T=tf)
+                                                                    T=tf,
+                                                                    sens=sens)
 
     px = traj[:, 0]
     py = traj[:, 1]

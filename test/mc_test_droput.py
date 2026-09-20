@@ -16,7 +16,7 @@ output = {}
 
 # Built once. The obstacle enters only through sol.obs, so it is swapped per
 # scenario instead of reconstructing the QP 500 times.
-sol = filter.Solver(x_dim=4, u_dim=2, obs=None, dt=dt)
+sol = filter.Solver(x_dim=4, u_dim=2, obs=None, dt=dt, max_n_obs=1)
 
 def corridor_gap(x0,xg,obs):
 
@@ -55,7 +55,7 @@ for drop in [0, 0.05, 0.2, 0.5]:
 
         obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o, delta=delta)
 
-        sol.obs = obs
+        sol.set_obstacles(obstacles=[obs])
         sol.reset(tphi0=t_phi_0)
 
         # Record skeleton. Every branch writes the same keys.
@@ -93,7 +93,7 @@ for drop in [0, 0.05, 0.2, 0.5]:
             continue
 
 
-        t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+        t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                         sol=sol,
                                                                         x0=x0, 
                                                                         xg=xg,

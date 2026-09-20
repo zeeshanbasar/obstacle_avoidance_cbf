@@ -1,10 +1,13 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, scenario_gen
+from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, scenario_gen, estimator
+
+SCENE_SEED = 1337
+SENSE_SEED = 42
 
 g = 9.81
-scene = scenario_gen.Scenario()
+scene = scenario_gen.Scenario(SCENE_SEED)
 t0, tf = 0.0, 200.0
 dt = 0.02
 
@@ -12,7 +15,8 @@ output = {}
 
 # Built once. The obstacle enters only through sol.obs, so it is swapped per
 # scenario instead of reconstructing the QP 500 times.
-sol = filter.Solver(x_dim=4, u_dim=2, obs=None, dt=dt)
+sol = filter.Solver(x_dim=4, u_dim=2, obs=None, dt=dt, max_n_obs=1)
+sens = estimator.Sensor()
 
 def corridor_gap(x0,xg,obs):
 
@@ -28,7 +32,10 @@ def corridor_gap(x0,xg,obs):
     return np.linalg.norm(c - closest) - obs[2]
 
 for delta in [0, 2, 5, 10, 20]:
+    scene.reseed(SCENE_SEED=SCENE_SEED)
     for i in range(500):
+
+        sens.reseed(SENSE_SEED+i)
         
         ##### INIT #####
         po_x, po_y, r_o = scene.obstacle()
@@ -43,7 +50,7 @@ for delta in [0, 2, 5, 10, 20]:
 
         obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o, delta=delta)
 
-        sol.obs = obs
+        sol.set_obstacles(obstacles=[obs])
         sol.reset(tphi0=t_phi_0)
 
         # Record skeleton. Every branch writes the same keys.
@@ -80,13 +87,14 @@ for delta in [0, 2, 5, 10, 20]:
             continue
 
 
-        t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+        t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                         sol=sol,
                                                                         x0=x0, 
                                                                         xg=xg,
                                                                         u0=guidance.nominal,
                                                                         h=dt,
-                                                                        T=tf)
+                                                                        T=tf,
+                                                                        sens=sens)
 
         px = traj[:, 0]
         py = traj[:, 1]

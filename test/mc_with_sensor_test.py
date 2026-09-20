@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from src import vehicle, rk45, limits, guidance, helpers, filter, obstacle, scenario_gen, estimator
 
 g = 9.81
-scene = scenario_gen.Scenario()
+SCENE_SEED = 1337
+SENSE_SEED = 42
+scene = scenario_gen.Scenario(SCENE_SEED=SCENE_SEED)
 t0, tf = 0.0, 200.0
 dt = 0.02
-
-SEED = 42
 
 output = {}
 
@@ -32,7 +32,7 @@ def corridor_gap(x0,xg,obs):
 sens = estimator.Sensor(False)
 for i in range(500):
 
-    sens.reseed(SEED + i)
+    sens.reseed(SENSE_SEED + i)
     
     ##### INIT #####
     po_x, po_y, r_o = scene.obstacle()
@@ -47,7 +47,7 @@ for i in range(500):
 
     obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
 
-    sol.obs = obs
+    sol.set_obstacles(obstacles=[obs])
     sol.reset(tphi0=t_phi_0)
 
     # Record skeleton. Every branch writes the same keys.
@@ -84,7 +84,7 @@ for i in range(500):
         continue
 
 
-    t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+    t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                     sol=sol,
                                                                     x0=x0, 
                                                                     xg=xg,
@@ -108,15 +108,16 @@ for i in range(500):
     for j in range(len(traj)):
         h.append(obs.h(traj[j,:]))
 
+    d_min = np.min(np.linalg.norm(traj[:, :2] - np.array([po_x, po_y]), axis=1))
+
     print(f"min h = {min(h):.6f}")
     print(f"min h at t = {t[np.argmin(h)]:.2f} s")
-    print(f"clearance = {(np.sqrt(min(h) + r_o**2) - r_o):.2f} m")
+    print(f"clearance = {d_min - obs.po_r_true:.2f} m")
     print(f"path length = {helpers.path_length(px, py):.2f} m")
     print(f"max |a| = {np.max(np.abs(a)):.2f} m/s^2")
     print(f"max |phi| = {np.max(np.abs(phi)):.2f} rads")
     print(f"max slack = {np.max(slacks):.2f}")
 
-    d_min = np.min(np.linalg.norm(traj[:, :2] - np.array([po_x, po_y]), axis=1))
     output[i]['min |h|'] = min(h)
     output[i]['clearance'] = d_min - obs.po_r_true
     output[i]['path length'] = helpers.path_length(px, py)

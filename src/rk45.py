@@ -48,6 +48,8 @@ def simulate_with_filter(f, sol, x0, xg, u0, h, T=None, nSteps=None, sens=None):
     inputs = [u_cert.copy()]
     slacks = [s]
     time = [t]
+    x_hat_store = [x_hat_0.copy()]
+    age = [sens.age]
 
     if (T is None) == (nSteps is None):
         raise ValueError("Give exactly one of T or nSteps.")
@@ -56,20 +58,23 @@ def simulate_with_filter(f, sol, x0, xg, u0, h, T=None, nSteps=None, sens=None):
         
     for _ in range(nSteps):
         x = rk4(f, t, x, u_cert, h)
-
+        t += h
+        
         x_hat = sens.measure(x, t)
         u = u0(x_hat, xg)
         u_cert, s = sol.solve(x_hat, u)
 
-        t += h
+        
         time.append(t)
 
         traj.append(x.copy())
         uncert_inputs.append(u.copy())
         inputs.append(u_cert.copy())
         slacks.append(s)
+        x_hat_store.append(x_hat.copy())
+        age.append(sens.age)
 
         if np.linalg.norm(x[:2]-xg[:2]) < 5.0:
             break
 
-    return np.array(time), np.array(traj), np.array(uncert_inputs), np.array(inputs), np.array(slacks)
+    return np.array(time), np.array(traj), np.array(uncert_inputs), np.array(inputs), np.array(slacks), np.array(x_hat_store), np.array(age)

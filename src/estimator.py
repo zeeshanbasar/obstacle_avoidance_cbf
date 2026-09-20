@@ -45,3 +45,4 @@ class Sensor():
         self.x_hat = None
         self.age = 0.0
         self.t_next = 0.0
+        self.max_age = -np.inf

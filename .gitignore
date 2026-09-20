@@ -20,3 +20,7 @@ figs/
 __pycache__/
 *.egg-info/
 *.pyc
+figures/
+scripts/
+outputs/
+plotting.py

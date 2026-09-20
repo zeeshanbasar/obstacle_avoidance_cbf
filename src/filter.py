@@ -138,7 +138,7 @@ class Solver():
             s_real = slack_val[:self.n_obs] if self.n_obs > 1 else slack_val
             if np.max(s_real, initial=0.0) > self.slack_tolerance:
                 print('\nFailed: Slack greater than tolerance')
-                print('Slack:', slack_val[:self.n_obs])
+                print('Slack:', slack_val[:self.n_obs]) if self.n_obs > 1 else print('Slack:', slack_val)
                 print('------------------------------------------------')
                 feasible = False
             c = sol.value(cost)

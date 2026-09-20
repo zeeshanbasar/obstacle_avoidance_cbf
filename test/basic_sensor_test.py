@@ -26,11 +26,12 @@ dt = 0.02
 po_x, po_y, r_o = 0.0, 0.0, 50.0
 obs = obstacle.Obstacle(po_x=po_x, po_y=po_y, po_r=r_o)
 
-sol = filter.Solver(x_dim=4, u_dim=2, obs=obs, dt=dt)
+sol = filter.Solver(x_dim=4, u_dim=2, dt=dt, max_n_obs=1)
+sol.set_obstacles(obstacles=[obs])
 
 for b in [False, True]:
 
-    t, traj, uncert_inputs, inputs, slacks = rk45.simulate_with_filter(f=vehicle.f, 
+    t, traj, uncert_inputs, inputs, slacks, _, _ = rk45.simulate_with_filter(f=vehicle.f, 
                                                                     sol=sol,
                                                                     x0=x0, 
                                                                     xg=xg,
